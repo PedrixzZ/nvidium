@@ -9,10 +9,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GameRenderer.class)
 public class MixinGameRenderer {
+
+    private static final float MAX_FAR_PLANE_DISTANCE = 16 * 512f; // Precalculate
+
     @Inject(method = "getFarPlaneDistance", at = @At("HEAD"), cancellable = true)
     public void method_32796(CallbackInfoReturnable<Float> cir) {
         if (Nvidium.IS_ENABLED) {
-            cir.setReturnValue(16 * 512f);
+            cir.setReturnValue(MAX_FAR_PLANE_DISTANCE); // Use the constant
             cir.cancel();
         }
     }
