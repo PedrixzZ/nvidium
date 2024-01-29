@@ -11,14 +11,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = ChunkBuildOutput.class, remap = false)
 public class MixinChunkBuildOutput implements IRepackagedResult {
-    @Unique private RepackagedSectionOutput repackagedSectionOutput;
 
+    @Unique
+    private RepackagedSectionOutput repackagedSectionOutput;
+
+    @Inject(method = "<init>", at = @At("RETURN")) // Inject at construction
+    private void initializeRepackagedOutput(CallbackInfo ci) {
+        this.repackagedSectionOutput = new RepackagedSectionOutput(); // Initialize
+    }
+
+    @Override
     public RepackagedSectionOutput getOutput() {
         return repackagedSectionOutput;
     }
 
+    @Override
     public void set(RepackagedSectionOutput output) {
-        repackagedSectionOutput = output;
+        this.repackagedSectionOutput = output;
     }
 
     @Inject(method = "delete", at = @At("HEAD"))
