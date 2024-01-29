@@ -9,21 +9,21 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(WorldRenderer.class)
 public class MixinWorldRenderer {
+
+    private static final int MAX_RENDER_DISTANCE = 9999999;
+    private static final int KEEP_DISTANCE_32 = 16 * 32;
+    private static final int KEEP_DISTANCE_256 = 16 * 256;
+
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F"))
     private float redirectMax(float a, float b) {
-        if (Nvidium.IS_ENABLED) {
-            return a;
-        }
-        return Math.max(a, b);
+        return Nvidium.IS_ENABLED ? a : Math.max(a, b);
     }
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;getViewDistance()F"))
     private float changeRD(GameRenderer instance) {
         float viewDistance = instance.getViewDistance();
-        if (Nvidium.IS_ENABLED) {
-            var dist = Nvidium.config.region_keep_distance * 16;
-            return dist == 32 * 16 ? viewDistance : (dist == 256 * 16 ? 9999999 : dist);
-        }
-        return viewDistance;
+        return Nvidium.IS_ENABLED ?
+                (Nvidium.config.region_keep_distance * 16 == KEEP_DISTANCE_32 ? viewDistance : MAX_RENDER_DISTANCE) :
+                viewDistance;
     }
 }
