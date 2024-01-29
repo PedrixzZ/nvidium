@@ -7,14 +7,12 @@ import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 @Mixin(BackgroundRenderer.class)
-
 public class MixinBackgroundRenderer {
+
+    private static final float MAX_FOG_DISTANCE = 9999999f; // Precalculate
+
     @ModifyConstant(method = "applyFog", constant = @Constant(floatValue = 192.0F))
     private static float changeFog(float fog) {
-        if (Nvidium.IS_ENABLED) {
-            return 9999999f;
-        } else {
-            return fog;
-        }
+        return Nvidium.IS_ENABLED ? MAX_FOG_DISTANCE : fog; // Concise conditional
     }
 }
